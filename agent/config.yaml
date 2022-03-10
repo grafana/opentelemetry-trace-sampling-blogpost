@@ -1,0 +1,15 @@
+server:
+  log_level: debug
+
+traces:
+  configs:
+  - name: server_traces
+    receivers:
+      otlp:
+        protocols:
+          http:
+            endpoint: "0.0.0.0:4318"
+
+    remote_write:
+      - endpoint: tempo:4317
+        insecure: true

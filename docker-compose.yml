@@ -1,0 +1,39 @@
+version: "3.1"
+volumes:
+  grafana:
+  postgres:
+services:
+  agent:
+    image: grafana/agent:main
+    ports:
+      - "4318:4318"
+    volumes:
+      - "${PWD}/agent/config.yaml:/etc/agent/agent.yaml"
+  dummy-server:
+    build: ./src
+    ports:
+      - "4000:4000"
+      - "80:80"
+    depends_on:
+      - tempo
+      - loki
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - "./grafana/definitions:/var/lib/grafana/dashboards"
+      - "./grafana/provisioning:/etc/grafana/provisioning"
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_FEATURE_TOGGLES_ENABLE=tempoSearch
+  loki:
+    image: grafana/loki
+    ports:
+      - "3100:3100"
+  tempo:
+    image: grafana/tempo
+    ports:
+      - "4317:4317"
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo.yaml
