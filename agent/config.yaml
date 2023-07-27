@@ -1,15 +1,20 @@
 server:
   log_level: debug
 
+# Configure trace receiving.
 traces:
+  # Define a single trace configuration, named `server_traces`.
   configs:
   - name: server_traces
+    # Define the protocols to receive traces on, OTLP HTTP on the default port (4318).
+    # See https://grafana.com/docs/agent/latest/configuration/traces-config/ receivers.
     receivers:
       otlp:
         protocols:
           http:
             endpoint: "0.0.0.0:4318"
 
+    # Send batched traces to the locally running Tempo service.
     remote_write:
       - endpoint: tempo:4317
         insecure: true

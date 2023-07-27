@@ -4,11 +4,11 @@ volumes:
   postgres:
 services:
   agent:
-    image: grafana/agent:main
+    image: grafana/agent:v0.35.2
     ports:
       - "4318:4318"
     volumes:
-      - "${PWD}/agent/config.yaml:/etc/agent/agent.yaml"
+      - "./agent/config.yaml:/etc/agent/agent.yaml"
   dummy-server:
     build: ./src
     ports:
@@ -18,20 +18,22 @@ services:
       - tempo
       - loki
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:10.0.3
     volumes:
       - "./grafana/definitions:/var/lib/grafana/dashboards"
       - "./grafana/provisioning:/etc/grafana/provisioning"
     ports:
       - "3000:3000"
     environment:
-      - GF_FEATURE_TOGGLES_ENABLE=tempoSearch
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
   loki:
-    image: grafana/loki
+    image: grafana/loki:2.8.3
     ports:
       - "3100:3100"
   tempo:
-    image: grafana/tempo
+    image: grafana/tempo:2.1.1
     ports:
       - "4317:4317"
     command: [ "-config.file=/etc/tempo.yaml" ]
